@@ -20,7 +20,7 @@ class perfsonar::repo {
   yumrepo { 'Internet2-web100_kernel':
     descr    => 'Internet2 Web100 Kernel RPM Repository - software.internet2.edu - main',
     baseurl  => 'http://software.internet2.edu/web100_kernel/rpms/el6/$basearch/main/',
-    enabled  => 0,
+    enabled  => 1,
     protect  => 0,
     gpgkey   => 'file:///etc/pki/rpm-gpg/RPM-GPG-KEY-Internet2',
     gpgcheck => 1,
