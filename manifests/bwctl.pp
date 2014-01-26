@@ -1,25 +1,41 @@
 class perfsonar::bwctl (
-  $manage_service = true,
-  $service_ensure = 'running',
-  $service_enable = true,
-) {
+  $manage_install = $::perfsonar::params::bwctl_manage_install,
+  $package_name   = $::perfsonar::params::bwctl_package_name,
+  $package_dep    = $::perfsonar::params::bwctl_package_dep,
+  $manage_service = $::perfsonar::params::bwctl_manage_service,
+  $service_ensure = $::perfsonar::params::bwctl_service_ensure,
+  $service_enable = $::perfsonar::params::bwctl_service_enable,
+) inherits perfsonar::params {
+  validate_bool($manage_install)
+  if ! (is_string($package_name) or is_array($package_name)) {
+    fail("${package_name} is not a string or array")
+  }
+  if ! (is_string($package_dep) or is_array($package_dep)) {
+    fail("${package_dep} is not a string or array")
+  }
   validate_bool($manage_service)
   validate_re($service_ensure, [ '^running$', '^stopped$' ],
     "${service_ensure} is not 'running' or 'stopped'")
   validate_bool($service_enable)
 
-  include perfsonar::params
+  anchor { "${name}::begin": }
 
-  package { $::perfsonar::params::bwctl_package_name:
-    ensure => present,
+  if $manage_install {
+    Anchor["${name}::begin"] ->
+    class { 'perfsonar::bwctl::install': } ->
+    Anchor["${name}::end"]
   }
-
-  # bwctl-1.4.2-5.el6 has iperf as a dep but not nuttcp
-  ensure_packages(any2array($::perfsonar::params::bwctl_package_dep))
 
   if $manage_service {
-    class { 'perfsonar::bwctl::service':
-      require => Package[$::perfsonar::params::bwctl_package_name],
+    Anchor["${name}::begin"] ->
+    class { 'perfsonar::bwctl::service': } ->
+    Anchor["${name}::end"]
+
+    if $manage_install {
+      Class['perfsonar::bwctl::install'] ->
+      Class['perfsonar::bwctl::service']
     }
   }
+
+  anchor { "${name}::end": }
 }
