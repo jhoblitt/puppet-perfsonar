@@ -6,6 +6,7 @@ class perfsonar::bwctl::service {
 
   service { 'bwctl':
     ensure     => $::perfsonar::bwctl::service_ensure,
+    name       => $::perfsonar::bwctl::service_name,
     enable     => $::perfsonar::bwctl::service_enable,
     hasrestart => true,
     hasstatus  => false,

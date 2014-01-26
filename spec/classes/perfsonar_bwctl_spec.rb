@@ -19,6 +19,7 @@ describe 'perfsonar::bwctl', :type => :class do
     it do
       should contain_service('bwctl').with({
         :ensure => 'running',
+        :name   => 'bwctld',
         :enable => true,
       })
     end
@@ -134,6 +135,28 @@ describe 'perfsonar::bwctl', :type => :class do
       it { should contain_class('perfsonar::bwctl::service') }
     end
   end # manage_service =>
+
+  context 'service_name =>' do
+    context 'foo' do
+      let(:params) {{ :service_name => 'foo' }}
+
+      it do
+        should contain_service('bwctl').with({
+          :name   => 'foo',
+          :ensure => 'running',
+          :enable => true,
+        })
+      end
+    end
+
+    context 'true' do
+      let(:params) {{ :service_name => true }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape("is not a string")}/)
+      end
+    end
+  end # service_name =>
 
   context 'service_ensure =>' do
     context 'running' do

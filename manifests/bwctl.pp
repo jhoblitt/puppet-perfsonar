@@ -3,6 +3,7 @@ class perfsonar::bwctl (
   $package_name   = $::perfsonar::params::bwctl_package_name,
   $package_dep    = $::perfsonar::params::bwctl_package_dep,
   $manage_service = $::perfsonar::params::bwctl_manage_service,
+  $service_name   = $::perfsonar::params::bwctl_service_name,
   $service_ensure = $::perfsonar::params::bwctl_service_ensure,
   $service_enable = $::perfsonar::params::bwctl_service_enable,
 ) inherits perfsonar::params {
@@ -14,6 +15,7 @@ class perfsonar::bwctl (
     fail("${package_dep} is not a string or array")
   }
   validate_bool($manage_service)
+  validate_string($service_name)
   validate_re($service_ensure, [ '^running$', '^stopped$' ],
     "${service_ensure} is not 'running' or 'stopped'")
   validate_bool($service_enable)
