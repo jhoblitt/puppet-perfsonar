@@ -67,6 +67,42 @@ describe 'perfsonar', :type => :class do
         it { should contain_class('perfsonar::bwctl') }
       end
     end # enable_bwctl =>
+
+    context 'enable_owamp =>' do
+      context 'true' do
+        let(:params) {{ :enable_owamp => true }}
+
+        it { should contain_class('perfsonar::owamp') }
+      end
+
+      context 'false' do
+        let(:params) {{ :enable_owamp => false }}
+
+        it { should_not contain_class('perfsonar::owamp') }
+      end
+
+      context 'foo' do
+        let(:params) {{ :enable_owamp => 'foo' }}
+
+        it 'should fail' do
+          expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a boolean')}/)
+        end
+      end
+
+      context 'true & manage_repo => true' do
+        let(:params) {{ :enable_owamp => true, :manage_repo => true }}
+
+        it { should contain_class('perfsonar::repo') }
+        it { should contain_class('perfsonar::owamp').that_requires('Class[perfsonar::repo]') }
+      end
+
+      context 'true & manage_repo => false' do
+        let(:params) {{ :enable_owamp => true, :manage_repo => false }}
+
+        it { should_not contain_class('perfsonar::repo') }
+        it { should contain_class('perfsonar::owamp') }
+      end
+    end # enable_owamp =>
   end
 
 end
