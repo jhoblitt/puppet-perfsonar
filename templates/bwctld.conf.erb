@@ -1,0 +1,10 @@
+# This file is managed by Puppet. DO NOT EDIT.
+<% @config.keys.sort.each do |key| -%>
+  <%- # at least puppet 3.4.2 leaks :undef-%>
+  <%- # https://tickets.puppetlabs.com/browse/PUP-1467 -%>
+  <%- if @config[key].nil? || @config[key] == :undef -%>
+<%=     key %>
+  <%- else -%>
+<%=     "%-23s %s" % [key, @config[key]] %>
+  <%- end -%>
+<%- end -%>

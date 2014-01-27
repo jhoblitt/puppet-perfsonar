@@ -1,11 +1,14 @@
 class perfsonar::bwctl (
-  $manage_install = $::perfsonar::params::bwctl_manage_install,
-  $package_name   = $::perfsonar::params::bwctl_package_name,
-  $package_dep    = $::perfsonar::params::bwctl_package_dep,
-  $manage_service = $::perfsonar::params::bwctl_manage_service,
-  $service_name   = $::perfsonar::params::bwctl_service_name,
-  $service_ensure = $::perfsonar::params::bwctl_service_ensure,
-  $service_enable = $::perfsonar::params::bwctl_service_enable,
+  $manage_install      = $::perfsonar::params::bwctl_manage_install,
+  $package_name        = $::perfsonar::params::bwctl_package_name,
+  $package_dep         = $::perfsonar::params::bwctl_package_dep,
+  $manage_service      = $::perfsonar::params::bwctl_manage_service,
+  $service_name        = $::perfsonar::params::bwctl_service_name,
+  $service_ensure      = $::perfsonar::params::bwctl_service_ensure,
+  $service_enable      = $::perfsonar::params::bwctl_service_enable,
+  $manage_config       = $::perfsonar::params::bwctl_manage_config,
+  $config_file_path    = $::perfsonar::params::bwctl_config_file_path,
+  $config_file_options = $::perfsonar::params::bwctl_config_file_options,
 ) inherits perfsonar::params {
   validate_bool($manage_install)
   if ! (is_string($package_name) or is_array($package_name)) {
@@ -19,13 +22,28 @@ class perfsonar::bwctl (
   validate_re($service_ensure, [ '^running$', '^stopped$' ],
     "${service_ensure} is not 'running' or 'stopped'")
   validate_bool($service_enable)
+  validate_bool($manage_config)
+  validate_absolute_path($config_file_path)
+  validate_hash($config_file_options)
 
+  $config = {}
   anchor { "${name}::begin": }
 
   if $manage_install {
     Anchor["${name}::begin"] ->
     class { 'perfsonar::bwctl::install': } ->
     Anchor["${name}::end"]
+  }
+
+  if $manage_config {
+    Anchor["${name}::begin"] ->
+    class { 'perfsonar::bwctl::config': } ->
+    Anchor["${name}::end"]
+
+    if $manage_install {
+      Class['perfsonar::bwctl::install'] ->
+      Class['perfsonar::bwctl::config']
+    }
   }
 
   if $manage_service {
@@ -35,6 +53,11 @@ class perfsonar::bwctl (
 
     if $manage_install {
       Class['perfsonar::bwctl::install'] ->
+      Class['perfsonar::bwctl::service']
+    }
+
+    if $manage_config {
+      Class['perfsonar::bwctl::config'] ->
       Class['perfsonar::bwctl::service']
     }
   }

@@ -23,6 +23,21 @@ describe 'perfsonar::bwctl', :type => :class do
         :enable => true,
       })
     end
+    it do
+      should contain_file('bwctld.conf').with({
+        :ensure  => 'file',
+        :path    => '/etc/bwctld/bwctld.conf',
+        :owner   => 'bwctl',
+        :group   => 'bwctl',
+        :mode    => '0755',
+        :replace => true,
+      })
+    end
+    it do
+      should contain_file('bwctld.conf').with_content(<<-EOS)
+# This file is managed by Puppet. DO NOT EDIT.
+EOS
+    end
   end # param defaults
 
   context 'manage_install =>' do
@@ -221,5 +236,61 @@ describe 'perfsonar::bwctl', :type => :class do
       end
     end
   end # service_enable =>
+
+  context 'manage_config =>' do
+    context 'true' do
+      let(:params) {{ :manage_config => true }}
+
+      it do
+        should contain_file('bwctld.conf').with({
+          :ensure  => 'file',
+          :path    => '/etc/bwctld/bwctld.conf',
+          :owner   => 'bwctl',
+          :group   => 'bwctl',
+          :mode    => '0755',
+          :replace => true,
+        })
+      end
+    end
+
+    context 'false' do
+      let(:params) {{ :manage_config => false }}
+
+      it { should_not contain_file('bwctld.conf') }
+    end
+
+    context 'foo' do
+      let(:params) {{ :manage_config => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a boolean')}/)
+      end
+    end
+  end # manage_config =>
+
+  context 'config_file_path =>' do
+    context '/dne' do
+      let(:params) {{ :config_file_path => '/dne' }}
+
+      it do
+        should contain_file('bwctld.conf').with({
+          :ensure  => 'file',
+          :path    => '/dne',
+          :owner   => 'bwctl',
+          :group   => 'bwctl',
+          :mode    => '0755',
+          :replace => true,
+        })
+      end
+    end
+
+    context '../dne' do
+      let(:params) {{ :config_file_path => '../dne' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not an absolute path')}/)
+      end
+    end
+  end # config_file_path =>
 
 end
