@@ -27,8 +27,8 @@ describe 'perfsonar::bwctl', :type => :class do
       should contain_file('bwctld.conf').with({
         :ensure  => 'file',
         :path    => '/etc/bwctld/bwctld.conf',
-        :owner   => 'bwctl',
-        :group   => 'bwctl',
+        :owner   => 'root',
+        :group   => 'root',
         :mode    => '0755',
         :replace => true,
       })
@@ -251,8 +251,8 @@ describe 'perfsonar::bwctl', :type => :class do
         should contain_file('bwctld.conf').with({
           :ensure  => 'file',
           :path    => '/etc/bwctld/bwctld.conf',
-          :owner   => 'bwctl',
-          :group   => 'bwctl',
+          :owner   => 'root',
+          :group   => 'root',
           :mode    => '0755',
           :replace => true,
         })
@@ -282,8 +282,8 @@ describe 'perfsonar::bwctl', :type => :class do
         should contain_file('bwctld.conf').with({
           :ensure  => 'file',
           :path    => '/dne',
-          :owner   => 'bwctl',
-          :group   => 'bwctl',
+          :owner   => 'root',
+          :group   => 'root',
           :mode    => '0755',
           :replace => true,
         })
