@@ -34,9 +34,15 @@ describe 'perfsonar::bwctl', :type => :class do
       })
     end
     it do
-      should contain_file('bwctld.conf').with_content(<<-EOS)
-# This file is managed by Puppet. DO NOT EDIT.
-EOS
+      should contain_file('bwctld.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+        # This file is managed by Puppet. DO NOT EDIT.
+        group                  bwctl
+        iperf_port             5001-5300
+        log_location
+        nuttcp_port            5301-5600
+        peer_port              6001-6200
+        user                   bwctl
+      EOS
     end
   end # param defaults
 
@@ -292,5 +298,65 @@ EOS
       end
     end
   end # config_file_path =>
+
+  context 'config_file_options =>' do
+    context '{}' do
+      let(:params) {{ :config_file_options => {} }}
+
+      it do
+        should contain_file('bwctld.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          group                  bwctl
+          iperf_port             5001-5300
+          log_location
+          nuttcp_port            5301-5600
+          peer_port              6001-6200
+          user                   bwctl
+        EOS
+      end
+    end
+
+    context '{ allow_unsync => undef }' do
+      let(:params) {{ :config_file_options => { 'allow_unsync' => nil } }}
+
+      it 'should add a new key' do
+        pending('rational ruby <-> DSL handling of nested hash values')
+        should contain_file('bwctld.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          allow_unsync
+          group                  bwctl
+          iperf_port             5001-5300
+          log_location
+          nuttcp_port            5301-5600
+          peer_port              6001-6200
+          user                   bwctl
+        EOS
+      end
+    end
+
+    context '{ user => nobody }' do
+      let(:params) {{ :config_file_options => { 'user' => 'nobody' } }}
+
+      it 'should replace a default key value' do
+        should contain_file('bwctld.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          group                  bwctl
+          iperf_port             5001-5300
+          log_location
+          nuttcp_port            5301-5600
+          peer_port              6001-6200
+          user                   nobody
+        EOS
+      end
+    end
+
+    context 'foo' do
+      let(:params) {{ :config_file_options => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a Hash')}/)
+      end
+    end
+  end # config_file_options =>
 
 end

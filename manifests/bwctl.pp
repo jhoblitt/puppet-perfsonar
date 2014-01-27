@@ -26,7 +26,17 @@ class perfsonar::bwctl (
   validate_absolute_path($config_file_path)
   validate_hash($config_file_options)
 
-  $config = {}
+  $config_file_defaults = {
+    'iperf_port'   => '5001-5300',
+    'nuttcp_port'  => '5301-5600',
+    'peer_port'    => '6001-6200',
+    'user'         => 'bwctl',
+    'group'        => 'bwctl',
+    'log_location' => undef,
+  }
+
+  $config = perfsonar_merge($config_file_defaults, $config_file_options)
+
   anchor { "${name}::begin": }
 
   if $manage_install {
