@@ -7,8 +7,8 @@ class perfsonar::bwctl::config {
   file { 'bwctld.conf':
     ensure  => 'file',
     path    => $::perfsonar::bwctl::config_file_path,
-    owner   => 'bwctl',
-    group   => 'bwctl',
+    owner   => 'root',
+    group   => 'root',
     mode    => '0755',
     replace => true,
     content => template("${module_name}/bwctld.conf.erb"),
