@@ -1,6 +1,7 @@
 require 'spec_helper'
 
 describe 'perfsonar', :type => :class do
+  let(:facts) {{ :concat_basedir => '/dne' }}
 
   describe 'for osfamily RedHat' do
     context 'defaults' do

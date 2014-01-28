@@ -9,6 +9,7 @@ class perfsonar::bwctl (
   $manage_config       = $::perfsonar::params::bwctl_manage_config,
   $config_file_path    = $::perfsonar::params::bwctl_config_file_path,
   $config_file_options = $::perfsonar::params::bwctl_config_file_options,
+  $manage_limits       = $::perfsonar::params::bwctl_manage_limits,
 ) inherits perfsonar::params {
   validate_bool($manage_install)
   if ! (is_string($package_name) or is_array($package_name)) {
@@ -56,6 +57,17 @@ class perfsonar::bwctl (
     }
   }
 
+  if $manage_limits {
+    Anchor["${name}::begin"] ->
+    class { 'perfsonar::bwctl::limits': } ->
+    Anchor["${name}::end"]
+
+    if $manage_install {
+      Class['perfsonar::bwctl::install'] ->
+      Class['perfsonar::bwctl::limits']
+    }
+  }
+
   if $manage_service {
     Anchor["${name}::begin"] ->
     class { 'perfsonar::bwctl::service': } ->
@@ -68,6 +80,11 @@ class perfsonar::bwctl (
 
     if $manage_config {
       Class['perfsonar::bwctl::config'] ->
+      Class['perfsonar::bwctl::service']
+    }
+
+    if $manage_limits {
+      Class['perfsonar::bwctl::limits'] ->
       Class['perfsonar::bwctl::service']
     }
   }

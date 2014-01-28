@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'perfsonar::bwctl', :type => :class do
+  let(:facts) {{ :concat_basedir => '/dne' }}
+
   package_list = [
     'bwctl', 'bwctl-client', 'bwctl-server',
     'iperf', 'nuttcp',

@@ -15,6 +15,7 @@ class perfsonar::params {
   $bwctl_manage_config       = true
   $bwctl_config_file_path    = '/etc/bwctld/bwctld.conf'
   $bwctl_config_file_options = {}
+  $bwctl_manage_limits       = true
 
   $owamp_manage_install = true
   $owamp_package_name   = [ 'owamp', 'owamp-client', 'owamp-server' ]

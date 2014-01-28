@@ -1,0 +1,10 @@
+<% max = @limit.keys.max -%>
+limit <%= @classname %> with \
+<% @limit.keys.sort.each do |key| -%>
+  <%- if key == max -%>
+    <%= key %>=<%= @limit[key] %>
+  <%- else -%>
+    <%= key %>=<%= @limit[key] %>, \
+  <%- end -%>
+<% end -%>
+
