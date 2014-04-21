@@ -26,6 +26,7 @@ class perfsonar::bwctl (
   validate_bool($manage_config)
   validate_absolute_path($config_file_path)
   validate_hash($config_file_options)
+  validate_bool($manage_limits)
 
   $config_file_defaults = {
     'iperf_port'   => '5001-5300',

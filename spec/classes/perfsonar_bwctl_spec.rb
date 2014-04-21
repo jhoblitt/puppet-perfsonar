@@ -46,6 +46,15 @@ describe 'perfsonar::bwctl', :type => :class do
         user                   bwctl
       EOS
     end
+    it do
+      should contain_concat('bwctld.limits').with({
+        :path  => '/etc/bwctld/bwctld.limits',
+        :owner => 'root',
+        :group => 'root',
+        :mode  => '0755',
+        :warn  => true,
+      })
+    end
   end # param defaults
 
   context 'manage_install =>' do
@@ -360,5 +369,35 @@ describe 'perfsonar::bwctl', :type => :class do
       end
     end
   end # config_file_options =>
+
+  context 'manage_limits =>' do
+    context 'true' do
+      let(:params) {{ :manage_limits => true }}
+
+      it do
+        should contain_concat('bwctld.limits').with({
+          :path  => '/etc/bwctld/bwctld.limits',
+          :owner => 'root',
+          :group => 'root',
+          :mode  => '0755',
+          :warn  => true,
+        })
+      end
+    end
+
+    context 'false' do
+      let(:params) {{ :manage_limits => false }}
+
+      it { should_not contain_concat('bwctld.limits') }
+    end
+
+    context 'foo' do
+      let(:params) {{ :manage_limits => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a boolean')}/)
+      end
+    end
+  end # manage_limits =>
 
 end
