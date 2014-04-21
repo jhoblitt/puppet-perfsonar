@@ -17,10 +17,14 @@ class perfsonar::params {
   $bwctl_config_file_options = {}
   $bwctl_manage_limits       = true
 
-  $owamp_manage_install = true
-  $owamp_package_name   = [ 'owamp', 'owamp-client', 'owamp-server' ]
-  $owamp_manage_service = true
-  $owamp_service_name   = 'owampd'
-  $owamp_service_ensure = 'running'
-  $owamp_service_enable = true
+  $owamp_manage_install      = true
+  $owamp_package_name        = [ 'owamp', 'owamp-client', 'owamp-server' ]
+  $owamp_manage_service      = true
+  $owamp_service_name        = 'owampd'
+  $owamp_service_ensure      = 'running'
+  $owamp_service_enable      = true
+  $owamp_manage_config       = true
+  $owamp_config_file_path    = '/etc/owampd/owampd.conf'
+  $owamp_config_file_options = {}
+  $owamp_manage_limits       = true
 }

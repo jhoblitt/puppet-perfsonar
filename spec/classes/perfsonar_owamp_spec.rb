@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe 'perfsonar::owamp', :type => :class do
+  let(:facts) {{ :concat_basedir => '/dne' }}
+
   package_list = [ 'owamp', 'owamp-client', 'owamp-server' ]
 
   shared_examples 'has_packages' do
@@ -195,5 +197,163 @@ describe 'perfsonar::owamp', :type => :class do
       end
     end
   end # service_enable =>
+
+  context 'manage_config =>' do
+    context 'true' do
+      let(:params) {{ :manage_config => true }}
+
+      it do
+        should contain_file('owampd.conf').with({
+          :ensure  => 'file',
+          :path    => '/etc/owampd/owampd.conf',
+          :owner   => 'root',
+          :group   => 'root',
+          :mode    => '0755',
+          :replace => true,
+        })
+      end
+    end
+
+    context 'false' do
+      let(:params) {{ :manage_config => false }}
+
+      it { should_not contain_file('owampd.conf') }
+    end
+
+    context 'foo' do
+      let(:params) {{ :manage_config => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a boolean')}/)
+      end
+    end
+  end # manage_config =>
+
+  context 'config_file_path =>' do
+    context '/dne' do
+      let(:params) {{ :config_file_path => '/dne' }}
+
+      it do
+        should contain_file('owampd.conf').with({
+          :ensure  => 'file',
+          :path    => '/dne',
+          :owner   => 'root',
+          :group   => 'root',
+          :mode    => '0755',
+          :replace => true,
+        })
+      end
+    end
+
+    context '../dne' do
+      let(:params) {{ :config_file_path => '../dne' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not an absolute path')}/)
+      end
+    end
+  end # config_file_path =>
+
+  context 'config_file_options =>' do
+    context '{}' do
+      let(:params) {{ :config_file_options => {} }}
+
+      it do
+        should contain_file('owampd.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          datadir                /var/lib/owamp
+          dieby                  5
+          diskfudge              3.0
+          facility               local5
+          group                  owamp
+          loglocation
+          testports              8760-8960
+          user                   owamp
+          vardir                 /var/run
+          verbose
+        EOS
+      end
+    end
+
+    context '{ allow_unsync => undef }' do
+      let(:params) {{ :config_file_options => { 'allow_unsync' => nil } }}
+
+      it 'should add a new key' do
+        pending('rational ruby <-> DSL handling of nested hash values')
+        should contain_file('owampd.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          allow_unsync
+          datadir                /var/lib/owamp
+          dieby                  5
+          diskfudge              3.0
+          facility               local5
+          group                  owamp
+          loglocation
+          testports              8760-8960
+          user                   owamp
+          vardir                 /var/run
+          verbose
+        EOS
+      end
+    end
+
+    context '{ user => nobody }' do
+      let(:params) {{ :config_file_options => { 'user' => 'nobody' } }}
+
+      it 'should replace a default key value' do
+        should contain_file('owampd.conf').with_content(<<-EOS.gsub(/^\s+/, ''))
+          # This file is managed by Puppet. DO NOT EDIT.
+          datadir                /var/lib/owamp
+          dieby                  5
+          diskfudge              3.0
+          facility               local5
+          group                  owamp
+          loglocation
+          testports              8760-8960
+          user                   nobody
+          vardir                 /var/run
+          verbose
+        EOS
+      end
+    end
+
+    context 'foo' do
+      let(:params) {{ :config_file_options => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a Hash')}/)
+      end
+    end
+  end # config_file_options =>
+
+  context 'manage_limits =>' do
+    context 'true' do
+      let(:params) {{ :manage_limits => true }}
+
+      it do
+        should contain_concat('owampd.limits').with({
+          :path  => '/etc/owampd/owampd.limits',
+          :owner => 'root',
+          :group => 'root',
+          :mode  => '0755',
+          :warn  => true,
+        })
+      end
+    end
+
+    context 'false' do
+      let(:params) {{ :manage_limits => false }}
+
+      it { should_not contain_concat('owampd.limits') }
+    end
+
+    context 'foo' do
+      let(:params) {{ :manage_limits => 'foo' }}
+
+      it 'should fail' do
+        expect { should }.to raise_error(Puppet::Error, /#{Regexp.escape('is not a boolean')}/)
+      end
+    end
+  end # manage_limits =>
 
 end
