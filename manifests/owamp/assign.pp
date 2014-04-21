@@ -1,4 +1,4 @@
-define perfsonar::bwctl::assign (
+define perfsonar::owamp::assign (
   $order           = 10,
   $authtype        = $name,
   $classname       = undef,
@@ -6,8 +6,8 @@ define perfsonar::bwctl::assign (
   validate_string($authtype)
   validate_string($classname)
 
-  concat::fragment { "bwctld.limits-assign-${name}":
-    target   => 'bwctld.limits',
+  concat::fragment { "owampd.limits-assign-${name}":
+    target   => 'owampd.limits',
     content  => template("${module_name}/bwctld.limits-assign.erb"),
     order    => $order,
   }

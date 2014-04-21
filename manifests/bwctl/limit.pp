@@ -35,7 +35,7 @@ define perfsonar::bwctl::limit (
     pending         => $pending,
   }, undef)
 
-  concat::fragment { "limit-${name}":
+  concat::fragment { "bwctld.limits-${name}":
     target   => 'bwctld.limits',
     content  => template("${module_name}/bwctld.limits.erb"),
     order    => $order,
